@@ -17,21 +17,30 @@ client = discogs_client.Client(
 )
 
 def main():
-    # TO-DO: display URL to user in a more user friendly way
-    print(get_auth_url())
+    get_auth_url()
 
-    oAuth_access_token = input('Enter oAuth Access Token: ')
-    client.get_access_token(oAuth_access_token)
+    oauth_verifier = get_oauth_verifier()
+
+    access_token, access_token_secret = get_access_token(oauth_verifier)
+
     identity = client.identity()
 
-    print(CONSUMER_KEY)
-    print(CONSUMER_SECRET)
-    print(TOKEN)
-    print(client)
-    print(oAuth_access_token)
-    print(identity)
+    print("CONSUMER_KEY:", CONSUMER_KEY)
+    print("CONSUMER_SECRET:", CONSUMER_SECRET)
+    print("Access Token:", access_token)
+    print("Access Token Secret:", access_token_secret)
+    print("Identity:", identity)
 
 def get_auth_url():
-    return client.get_authorize_url()
+    request_token, request_secret, auth_url = client.get_authorize_url()
+    print("Visit this URL to authorize: " + auth_url)
+    return request_token, request_secret, auth_url
+
+def get_oauth_verifier():
+    oauth_verifier = input('Enter OAuth Verifier: ')
+    return oauth_verifier
+
+def get_access_token(oauth_verifier):
+    return client.get_access_token(oauth_verifier)
 
 main()
