@@ -33,12 +33,6 @@ def main():
         identity = client.identity()
         print("Identity:", identity)
 
-    # print("CONSUMER_KEY:", CONSUMER_KEY)
-    # print("CONSUMER_SECRET:", CONSUMER_SECRET)
-    # print("Access Token:", access_token)
-    # print("Access Token Secret:", access_token_secret)
-    # print("Identity:", identity)
-
 def get_auth_url():
     request_token, request_secret, auth_url = client.get_authorize_url()
     print("Visit this URL to authorize: " + auth_url)
@@ -52,9 +46,35 @@ def get_access_token(oauth_verifier):
     return client.get_access_token(oauth_verifier)
 
 def store_tokens(access_token, access_token_secret):
-    with open('.env', 'a') as f:
-        f.write(f"TOKEN={access_token}\n")
-        f.write(f"TOKEN_SECRET={access_token_secret}\n")
+    # read existing .env file
+    with open('.env', 'r') as f:
+        lines = f.readlines()
+
+    # prepare updated lines
+    updated_lines = []
+    found_access_token = False
+    found_access_token_secret = False
+
+    for line in lines:
+        if line.startswith("ACCESS_TOKEN="):
+            updated_lines.append(f"ACCESS_TOKEN={access_token}\n")
+            found_access_token = True
+        elif line.startswith("ACCESS_TOKEN_SECRET="):
+            updated_lines.append(f"ACCESS_TOKEN_SECRET={access_token_secret}\n")
+            found_access_token_secret = True
+        else:
+            updated_lines.append(line)
+
+    # add new tokens if not found
+    if not found_access_token:
+        updated_lines.append(f"ACCESS_TOKEN={access_token}\n")
+    if not found_access_token_secret:
+        updated_lines.append(f"ACCESS_TOKEN_SECRET={access_token_secret}\n")
+
+    # write updated .env file
+    with open('.env', 'w') as f:
+        f.writelines(updated_lines)
+
     print("Tokens saved to .env file.")
 
 main()
